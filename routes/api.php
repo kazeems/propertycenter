@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PropertyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -15,8 +16,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('properties', [PropertyController::class, 'getProperties']);
-Route::get('properties/{propertyId}', [PropertyController::class, 'getProperty']);
-Route::put('properties/{propertyId}', [PropertyController::class, 'updateProperty']);
-Route::post('properties', [PropertyController::class, 'createProperty']);
-Route::delete('properties/{propertyId}', [PropertyController::class, 'deleteProperty']);
+Route::group(['middleware' => 'auth:sanctum'], function(){
+    Route::get('properties', [PropertyController::class, 'getProperties']);
+    Route::get('properties/{propertyId}', [PropertyController::class, 'getProperty']);
+    Route::put('properties/{propertyId}', [PropertyController::class, 'updateProperty']);
+    Route::post('properties', [PropertyController::class, 'createProperty']);
+    Route::delete('properties/{propertyId}', [PropertyController::class, 'deleteProperty']);
+});
+
+Route::post('register', [AuthController::class, 'register']);
+Route::post('login', [AuthController::class, 'login']);
+Route::post('logout', [AuthController::class, 'logout']);

@@ -18,7 +18,7 @@ class PropertyController extends Controller
         ]);
         // add property to database table
         $newProperty = Property::create([
-            'user_id' => 1,
+            'user_id' => auth()->id(),
             'name' => $request->name,
             'slug' => Str::slug($request->name),
             'state' => $request->state,
