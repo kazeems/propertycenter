@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Rules\CheckCurrentAndNewPass;
+use App\Rules\CheckCurrentPassword;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -76,5 +78,40 @@ class AuthController extends Controller
             'success' => true,
             'message' => 'User logged out successfully'
         ]);
+    }
+
+    public function updateMyPassword(Request $request) {
+        $request->validate([
+            'current_password' => ['required', new CheckCurrentPassword],
+            'new_password' => ['required','min:6', 'confirmed', new CheckCurrentAndNewPass],
+        ]);
+
+        $user = auth('sanctum')->user();
+
+        // Using the if condition logic inside controller instead of custom rule
+        // if($request->new_password === $request->current_password) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'New password cannot be same as current password.'
+        //     ]);
+        // } else {
+
+        $user->update(['password' => Hash::make($request->new_password)]);
+
+         // delete any existing token for the user
+         $user->tokens()->delete();
+
+         // create a new token for the user
+        $token = $user->createToken("login")->plainTextToken;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password updated successfully.',
+            'data' => [
+                'token' => $token
+            ]
+        ]);
+    // }
+
     }
 }

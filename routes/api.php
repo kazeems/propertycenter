@@ -17,6 +17,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group(['middleware' => 'auth:sanctum'], function(){
+    Route::post('logout', [AuthController::class, 'logout']);
+
+    // Password update
+    Route::post('users/password/update', [AuthController::class, 'updateMyPassword']);
+
     Route::get('properties', [PropertyController::class, 'getProperties']);
     Route::get('properties/{propertyId}', [PropertyController::class, 'getProperty']);
     Route::put('properties/{propertyId}', [PropertyController::class, 'updateProperty']);
@@ -26,4 +31,3 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
-Route::post('logout', [AuthController::class, 'logout']);
