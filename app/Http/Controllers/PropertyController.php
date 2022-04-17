@@ -14,7 +14,9 @@ class PropertyController extends Controller
             'name' => ['required','min:5','unique:properties,name'],
             'state' => ['required'],
             'type' => ['required'],
-            'bedrooms' => ['required']
+            'bedrooms' => ['required'],
+            'address' => ['required','string'],
+            'price_per_anum' => ['required','integer']
         ]);
         // add property to database table
         $newProperty = Property::create([
@@ -23,7 +25,9 @@ class PropertyController extends Controller
             'slug' => Str::slug($request->name),
             'state' => $request->state,
             'type' => $request->type,
-            'bedrooms' => $request->bedrooms
+            'bedrooms' => $request->bedrooms,
+            'address' => $request->address,
+            'price_per_anum' => $request->price_per_anum
         ]);
         // return succcess response
         return response()->json([
@@ -106,5 +110,36 @@ class PropertyController extends Controller
             ]);
         }
 
+    }
+
+    public function search(Request $request) {
+
+        $property = new Property();
+        $query = $property->newQuery();
+
+        if($request->has('state')) {
+            $query->where('state', $request->state);
+        }
+
+        if($request->has('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if($request->has('bedrooms')) {
+            $query->where('bedrooms', $request->bedrooms);
+        }
+
+        if($request->has('minPrice')) {
+            $query->where('price_per_anum', '>=', $request->minPrice);
+        }
+
+        if($request->has('maxPrice')) {
+            $query->where('price_per_anum', '<=', $request->maxPrice);
+        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Search results found',
+            'data' => $query->get()
+        ]);
     }
 }

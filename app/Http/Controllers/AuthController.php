@@ -82,19 +82,11 @@ class AuthController extends Controller
 
     public function updateMyPassword(Request $request) {
         $request->validate([
-            'current_password' => ['required', new CheckCurrentPassword],
-            'new_password' => ['required','min:6', 'confirmed', new CheckCurrentAndNewPass],
+            'current_password' => ['required', new CheckCurrentPassword()],
+            'new_password' => ['required','min:6', new CheckCurrentAndNewPass(), 'confirmed'],
         ]);
 
         $user = auth('sanctum')->user();
-
-        // Using the if condition logic inside controller instead of custom rule
-        // if($request->new_password === $request->current_password) {
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'New password cannot be same as current password.'
-        //     ]);
-        // } else {
 
         $user->update(['password' => Hash::make($request->new_password)]);
 
@@ -111,7 +103,25 @@ class AuthController extends Controller
                 'token' => $token
             ]
         ]);
-    // }
 
+    }
+
+    public function updateUser(Request $request) {
+        $request->validate([
+            'name' => ['required','min:3'],
+            'email' => ['required']
+        ]);
+
+        $user = auth('sanctum')->user();
+
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Name updated successfully'
+        ]);
     }
 }
