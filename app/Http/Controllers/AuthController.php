@@ -108,16 +108,14 @@ class AuthController extends Controller
 
     public function updateUser(Request $request) {
         $request->validate([
-            'name' => ['required'],
+            'name' => ['required','min:3']
         ]);
       
 
         $user = auth('sanctum')->user();
-        dd($user->name);
 
         $user->update([
-            'name' => $request->name,
-            'email' => $request->email
+            'name' => $request->name
         ]);
 
         return response()->json([
