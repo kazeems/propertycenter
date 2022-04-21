@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\UploadImage;
 use App\Models\Property;
 use Illuminate\Http\Request;
 use Str;
@@ -16,8 +17,19 @@ class PropertyController extends Controller
             'type' => ['required'],
             'bedrooms' => ['required'],
             'address' => ['required','string'],
-            'price_per_anum' => ['required','integer']
+            'price_per_anum' => ['required','integer'],
+            'image' => ['mimes:png,jpeg,gif,bmp', 'max:2048']
         ]);
+
+         //get the image
+         $image = $request->file('image');
+ 
+         // get original file name and replace any spaces with _
+         // example: ofiice card.png = timestamp()_office_card.pnp
+         $filename = time()."_".preg_replace('/\s+/', '_', strtolower($image->getClientOriginalName()));
+ 
+         // move image to temp location (tmp disk)
+         $tmp = $image->storeAs('uploads/original', $filename, 'tmp');
         // add property to database table
         $newProperty = Property::create([
             'user_id' => auth()->id(),
@@ -26,9 +38,15 @@ class PropertyController extends Controller
             'state' => $request->state,
             'type' => $request->type,
             'bedrooms' => $request->bedrooms,
+            'image' => $filename,
+            'disk' => config('site.upload_disk'),
             'address' => $request->address,
             'price_per_anum' => $request->price_per_anum
         ]);
+
+        //dispacth job to handle image manipulation
+        $this->dispatch(new UploadImage($newProperty));
+
         // return succcess response
         return response()->json([
             'success' => true,

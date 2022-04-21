@@ -29,6 +29,8 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
     // Password update
     Route::post('users/password/update', [AuthController::class, 'updateMyPassword']);
     Route::post('users/details/update', [AuthController::class, 'updateUser']);
+
+
     Route::get('properties/{propertyId}', [PropertyController::class, 'getProperty']);
     Route::put('properties/{propertyId}', [PropertyController::class, 'updateProperty']);
     Route::post('properties', [PropertyController::class, 'createProperty']);
