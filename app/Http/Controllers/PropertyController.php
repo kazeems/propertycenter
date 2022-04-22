@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\UploadImage;
 use App\Models\Property;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Str;
 
 class PropertyController extends Controller
@@ -65,7 +66,7 @@ class PropertyController extends Controller
 
     public function getProperty(Request $request, $propertyId) {
         $property = Property::find($propertyId);
-        if($property == null) {
+        if(!$property) {
             return response()->json([
                 'success' => false,
                 'message' => 'Property does not exist'
@@ -74,7 +75,10 @@ class PropertyController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Property found successfully',
-                'data' => $property
+                'data' => [
+                    'property' => $property,
+                    'property_images' => $property->images
+                ]
             ]);
         }
     }
@@ -112,12 +116,21 @@ class PropertyController extends Controller
     public function deleteProperty($propertyId) {
         $delProperty = Property::find($propertyId);
         // Check if property exists
-        if($delProperty == null) {
+        if(!$delProperty) {
             return response()->json([
                 'success' => false,
                 'message' => 'Property does not exist'
             ]);
-        } else {
+        } 
+
+        //Deleting the images associated with the products
+        foreach (['thumbnail', 'large', 'original'] as $size) {
+            //check if file exist
+            if (Storage::disk($delProperty->disk)->exists("uploads/properties/{$size}/" . $delProperty->image)) {
+                Storage::disk($delProperty->disk)->delete("uploads/properties/{$size}/" . $delProperty->image);
+            }
+        }
+
         // delete property
             $delProperty->delete();
 
@@ -127,8 +140,6 @@ class PropertyController extends Controller
                 'message' => 'Property deleted successfully'
             ]);
         }
-
-    }
 
     public function search(Request $request) {
 
