@@ -24,6 +24,10 @@ class Property extends Model
         'disk'
     ];
 
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
+
     public function getImagesAttribute()
     {
         return [

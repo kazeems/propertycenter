@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PropertyResource;
 use App\Jobs\UploadImage;
 use App\Models\Property;
 use Illuminate\Http\Request;
@@ -52,7 +53,7 @@ class PropertyController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'New property created successfully',
-            'data' => $newProperty
+            'data' => new PropertyResource($newProperty)
         ]);
 
     }
@@ -60,7 +61,7 @@ class PropertyController extends Controller
         $allProperties = Property::all();
         return response()->json([
             'success' => true,
-            'data' => $allProperties
+            'data' => PropertyResource::collection($allProperties)
         ]);
     }
 
@@ -76,8 +77,7 @@ class PropertyController extends Controller
                 'success' => true,
                 'message' => 'Property found successfully',
                 'data' => [
-                    'property' => $property,
-                    'property_images' => $property->images
+                    'property' => new PropertyResource($property)
                 ]
             ]);
         }
@@ -139,7 +139,7 @@ class PropertyController extends Controller
                 'success' => true,
                 'message' => 'Property deleted successfully'
             ]);
-        }
+    }
 
     public function search(Request $request) {
 

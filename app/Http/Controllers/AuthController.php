@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Rules\CheckCurrentAndNewPass;
 use App\Rules\CheckCurrentPassword;
@@ -120,7 +121,8 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Name updated successfully'
+            'message' => 'Name updated successfully',
+            'data' => new UserResource($user)
         ]);
     }
 }
