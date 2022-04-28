@@ -16,13 +16,16 @@ class PropertyController extends Controller
         $request->validate([
             'name' => ['required','min:5','unique:properties,name'],
             'state' => ['required'],
-            'type' => ['required'],
+            'type' => ['required','in:buy,rent,shorlet'],
             'bedrooms' => ['required'],
+            'bathrooms' => ['required','integer'],
+            'toilets'   => ['required','integer'],
             'address' => ['required','string'],
             'price_per_anum' => ['required','integer'],
             'image' => ['mimes:png,jpeg,gif,bmp', 'max:2048']
         ]);
 
+    
          //get the image
          $image = $request->file('image');
  
@@ -43,7 +46,9 @@ class PropertyController extends Controller
             'image' => $filename,
             'disk' => config('site.upload_disk'),
             'address' => $request->address,
-            'price_per_anum' => $request->price_per_anum
+            'price_per_anum' => $request->price_per_anum,
+            'bathrooms' => $request->bathrooms,
+            'toilets' => $request->toilets
         ]);
 
         //dispacth job to handle image manipulation
@@ -65,14 +70,14 @@ class PropertyController extends Controller
         ]);
     }
 
-    public function getProperty(Request $request, $propertyId) {
-        $property = Property::find($propertyId);
-        if(!$property) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Property does not exist'
-            ]);
-        } else {
+    public function getProperty(Request $request, Property $property) {
+        // $property = Property::find($propertyId);
+        // if(!$property) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Property does not exist'
+        //     ]);
+        // }
             return response()->json([
                 'success' => true,
                 'message' => 'Property found successfully',
@@ -80,59 +85,65 @@ class PropertyController extends Controller
                     'property' => new PropertyResource($property)
                 ]
             ]);
-        }
     }
 
-    public function updateProperty(Request $request, $propertyId) {
+    public function updateProperty(Request $request, Property $property) {
         $request->validate([
-            'name' => ['required','min:5','unique:properties,name,'. $propertyId],
+            'name' => ['required','min:5','unique:properties,name,'. $property->id],
             'state' => ['required'],
             'type' => ['required'],
             'bedrooms' => ['required']
         ]);
+
         // add updated property info to database table
-            $propertyInfo = Property::find($propertyId);
-            if($propertyInfo == null) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Property does not exist'
-                ]);
-            } else {
-                $propertyInfo->name = $request->name;
-                $propertyInfo->slug = Str::slug($request->name);
-                $propertyInfo->state = $request->state;
-                $propertyInfo->type = $request->type;
-                $propertyInfo->bedrooms = $request->bedrooms;
-                $propertyInfo->save();
+        //this line of code is not needed anymore since we alread have an 
+        // instance of the Property in the request from the route
+            // $propertyInfo = Property::find($property);
+
+            // if($propertyInfo == null) {
+            //     return response()->json([
+            //         'success' => false,
+            //         'message' => 'Property does not exist'
+            //     ]);
+            // } 
+
+            $this->authorize('update', $property);
+
+                $property->name = $request->name;
+                $property->slug = Str::slug($request->name);
+                $property->state = $request->state;
+                $property->type = $request->type;
+                $property->bedrooms = $request->bedrooms;
+                $property->save();
             
             // return succcess response
             return response()->json([
                 'success' => true,
                 'message' => 'Property inforamtion updated successfully'
             ]);
-        }
     }
 
-    public function deleteProperty($propertyId) {
-        $delProperty = Property::find($propertyId);
-        // Check if property exists
-        if(!$delProperty) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Property does not exist'
-            ]);
-        } 
+    public function deleteProperty(Property $property) {
+        // $delProperty = Property::find($propertyId);
+        // // Check if property exists
+        // if(!$delProperty) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Property does not exist'
+        //     ]);
+        // } 
 
+        $this->authorize('delete', $property);
         //Deleting the images associated with the products
         foreach (['thumbnail', 'large', 'original'] as $size) {
             //check if file exist
-            if (Storage::disk($delProperty->disk)->exists("uploads/properties/{$size}/" . $delProperty->image)) {
-                Storage::disk($delProperty->disk)->delete("uploads/properties/{$size}/" . $delProperty->image);
+            if (Storage::disk($property->disk)->exists("uploads/properties/{$size}/" . $property->image)) {
+                Storage::disk($property->disk)->delete("uploads/properties/{$size}/" . $property->image);
             }
         }
 
         // delete property
-            $delProperty->delete();
+            $property->delete();
 
             // return succcess response
             return response()->json([

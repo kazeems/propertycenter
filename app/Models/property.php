@@ -21,7 +21,9 @@ class Property extends Model
         'price_per_anum',
         'image',
         'upload_successful',
-        'disk'
+        'disk',
+        'bathrooms',
+        'toilets'
     ];
 
     public function user() {

@@ -23,6 +23,8 @@ class PropertyResource extends JsonResource
             "state" => $this->state,
             "type" => $this->type,
             "bedrooms" => $this->bedrooms,
+            "bathrooms" => $this->bathrooms,
+            "toilets" => $this->toilets,
             "created_dates" => [
                 "created_at_human" => $this->created_at->diffForHumans(),
                 "created_at" => $this->created_at

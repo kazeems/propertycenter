@@ -34,8 +34,8 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
     Route::post('users/details/update', [AuthController::class, 'updateUser']);
 
     // Properties
-    Route::get('properties/{propertyId}', [PropertyController::class, 'getProperty']);
-    Route::put('properties/{propertyId}', [PropertyController::class, 'updateProperty']);
+    Route::get('properties/{property}', [PropertyController::class, 'getProperty']);
+    Route::put('properties/{property}', [PropertyController::class, 'updateProperty']);
     Route::post('properties', [PropertyController::class, 'createProperty']);
-    Route::delete('properties/{propertyId}', [PropertyController::class, 'deleteProperty']);
+    Route::delete('properties/{property}', [PropertyController::class, 'deleteProperty']);
 });
