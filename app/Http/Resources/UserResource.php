@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Property;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserResource extends JsonResource
@@ -18,6 +19,7 @@ class UserResource extends JsonResource
             "id" => $this->id,
             "fullname" => $this->name,
             "initials" => str_split($this->name)[0]." ".str_split($this->name)[1],
+            "properties" => $this->properties,
             "created_dates" => [
                 "created_at_human" => $this->created_at->diffForHumans(),
                 "created_at" => $this->created_at
