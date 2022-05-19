@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\PropertyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -38,4 +39,6 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
     Route::put('properties/{property}', [PropertyController::class, 'updateProperty']);
     Route::post('properties', [PropertyController::class, 'createProperty']);
     Route::delete('properties/{property}', [PropertyController::class, 'deleteProperty']);
+
+    Route::post('properties/{property}/gallery', [GalleryController::class, 'uploadImageToGallery']);
 });

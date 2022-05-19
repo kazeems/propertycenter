@@ -19,6 +19,7 @@ class PropertyResource extends JsonResource
             "user" => new UserResource($this->user),
             "name" => $this->name,
             "images" => $this->images,
+            "gallery" => $this->galleryImages,
             "slug" => $this->slug,
             "state" => $this->state,
             "type" => $this->type,

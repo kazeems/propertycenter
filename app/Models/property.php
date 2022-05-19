@@ -39,8 +39,27 @@ class Property extends Model
         ];
     }
 
+    public function getGalleryImagesAttribute()
+    {
+        $galleryImageLink = [];
+
+        foreach($this->galleries as $gallery) {
+            array_push($galleryImageLink, $this->getGalleryImagePath($gallery->disk, $gallery->image));
+        }
+
+        return $galleryImageLink;
+    }
+
+    public function getGalleryImagePath($disk, $image) {
+        return Storage::disk($disk)->url("uploads/properties/gallery" . $image);
+    }
+
     public function getImagePath($size)
     {
         return Storage::disk($this->disk)->url("uploads/properties/{$size}/" . $this->image);
+    }
+
+    public function galleries() {
+        return $this->hasMany(Gallery::class);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\PropertyResource;
 use App\Jobs\UploadImage;
+use App\Models\Gallery;
 use App\Models\Property;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -142,6 +143,12 @@ class PropertyController extends Controller
             }
         }
 
+        foreach($property->galleries as $gallery) {
+             //check if file exist
+             if (Storage::disk($gallery->disk)->exists("uploads/properties/gallery/" . $gallery->image)) {
+                Storage::disk($gallery->disk)->delete("uploads/properties/gallery/" . $gallery->image);
+            }
+        }
         // delete property
             $property->delete();
 
@@ -182,4 +189,5 @@ class PropertyController extends Controller
             'data' => $query->get()
         ]);
     }
+    
 }
